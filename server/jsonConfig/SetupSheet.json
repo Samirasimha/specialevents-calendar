@@ -1,0 +1,57 @@
+{
+  "configs": [
+    {
+      "Name": "SpecialEventsSetUp",
+      "Header": 1,
+      "HeaderDataType": "string",
+      "timeZone": "America/Fort_Wayne",
+      "Fields": [
+        {
+          "Name": "Start Time",
+          "DataType": "DateTime",
+          "CalendarField": "start"
+        },
+        {
+          "Name": "End Time",
+          "DataType": "DateTime",
+          "CalendarField": "end"
+        },
+        {
+          "Name": "Event Name",
+          "DataType": "string",
+          "CalendarField": "title"
+        },
+        {
+          "Name": "Location",
+          "DataType": "string",
+          "CalendarField": "end"
+        },
+        {
+          "Name": "Description",
+          "DataType": "string",
+          "CalendarField": "description"
+        },
+        {
+          "Name": "Event Start Time",
+          "DataType": "DateTime",
+          "CalendarField": "description"
+        },
+        {
+          "Name": "Event End Time",
+          "DataType": "DateTime",
+          "CalendarField": "description"
+        },
+        {
+          "Name": "Notes",
+          "DataType": "string",
+          "CalendarField": "description"
+        },
+        {
+          "Name": "Event Coordinator",
+          "DataType": "string",
+          "CalendarField": "organizer"
+        }
+      ]
+    }
+  ]
+}
