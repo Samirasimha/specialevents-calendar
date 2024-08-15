@@ -1,4 +1,4 @@
-const { ReadExcelFile } = require("../services/excelReader");
+const { ReadExcelFile, testOfTime } = require("../services/excelReader");
 
 const ReadExcelAndAddToDatabase = async (req, res) => {
   console.log("second");
@@ -12,6 +12,12 @@ const ReadExcelAndAddToDatabase = async (req, res) => {
   res.send(response);
 };
 
+const TestOfTime = async (req, res) => {
+  console.log("In the Controller");
+  res.send(await testOfTime());
+};
+
 module.exports = {
   ReadExcelAndAddToDatabase,
+  TestOfTime,
 };

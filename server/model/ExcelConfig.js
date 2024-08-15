@@ -10,6 +10,10 @@ class ExcelConfig {
   addEvent(event) {
     this.Events.push(event);
   }
+
+  static from(json) {
+    return Object.assign(new Student(), json);
+  }
 }
 
 module.exports = ExcelConfig;

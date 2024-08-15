@@ -14,4 +14,6 @@ router.post(
   excelController.ReadExcelAndAddToDatabase
 );
 
+router.get("/TestOfTime", excelController.TestOfTime);
+
 module.exports = router;

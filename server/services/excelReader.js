@@ -1,7 +1,45 @@
 const supabase = require("../config/supabaseClient");
 const readXlsxFile = require("read-excel-file/node");
 const ics = require("ics");
+const ExcelConfig = require("../model/ExcelConfig");
+const fs = require("fs");
+const excelConfigFilePath = "./jsonConfig/SetupSheet.json";
 
+//#region public Methods
+
+const testOfTime = async (req, res) => {
+  const data = await ExtractFromJson();
+
+  console.log(data.configs);
+
+  return await ExtractFromJson();
+};
+
+//#endregion
+
+//#region private Methods
+
+const ExtractFromJson = async () => {
+  return fs.readFileSync(excelConfigFilePath, "utf8", (err, jsonData) => {
+    if (err) {
+      console.error("Error reading JSON file:", err.message);
+      return;
+    }
+
+    try {
+      // return ExcelConfig.from(JSON.parse(jsonData));
+      console.log("Returning the Json");
+      // console.log(jsonData);
+      return ExcelConfig.from(JSON.parse(jsonData));
+    } catch (parseErr) {
+      console.error("Error parsing JSON:", parseErr.message);
+    }
+  });
+};
+
+//#endregion
+
+//#region Legacy
 const ReadExcelFile = async (req, res) => {
   try {
     const excelData = await ConvertExcelToReadableRows(req);
@@ -19,8 +57,11 @@ const ReadExcelFile = async (req, res) => {
 
       row.date = date;
 
-      row.starttime = await ProcessTimeAndDate(date, excelData[i][0]);
-      row.endtime = await ProcessTimeAndDate(date, excelData[i][1]);
+      // row.starttime = await ProcessTimeAndDate(date, excelData[i][0]);
+      // row.endtime = await ProcessTimeAndDate(date, excelData[i][1]);
+
+      row.starttime = await convertToUTC(excelData[0][0], excelData[i][0]);
+      row.endtime = await convertToUTC(excelData[0][0], excelData[i][1]);
 
       if (row.endtime < row.starttime) {
         row.endtime = row.endtime.getDate() + 1;
@@ -97,6 +138,60 @@ async function CreateiCalendarFile(Events) {
 
 //#region private methods
 
+async function convertToUTC(
+  dateString,
+  timeString,
+  timeZone = "America/Fort_Wayne"
+) {
+  // Parse the date and time strings
+  const dateTimeString = `${dateString} ${timeString}`;
+  const dateTime = new Date(dateTimeString);
+
+  // Get the local time offset in minutes
+  const localOffset = dateTime.getTimezoneOffset();
+
+  // Get the time zone offset for the specified time zone in milliseconds
+  const timeZoneOffset =
+    new Date(
+      dateTime.toLocaleString("en-US", { timeZone })
+    ).getTimezoneOffset() *
+    60 *
+    1000;
+
+  // Calculate the total offset in milliseconds
+  const totalOffset = localOffset * 60 * 1000 - timeZoneOffset;
+
+  // Adjust the date and time to UTC
+  const utcDateTime = new Date(dateTime.getTime() + totalOffset);
+
+  return utcDateTime;
+}
+
+function convertToTimeZone(date, timeZone = "America/Fort_Wayne") {
+  // Create a new date object with the same UTC time
+  const utcDate = new Date(date.getTime());
+
+  // Get the time zone offset for the specified time zone in milliseconds
+  const timeZoneOffset =
+    new Date(
+      utcDate.toLocaleString("en-US", { timeZone })
+    ).getTimezoneOffset() *
+    60 *
+    1000;
+
+  // Adjust the date and time to the specified time zone
+  const timeZoneDate = new Date(utcDate.getTime() + timeZoneOffset);
+
+  // Extract the year, month, date, hour, and minute
+  const year = timeZoneDate.getFullYear();
+  const month = timeZoneDate.getMonth() + 1; // Months are 0-indexed, so add 1
+  const day = timeZoneDate.getDate();
+  const hour = timeZoneDate.getHours();
+  const minute = timeZoneDate.getMinutes();
+
+  return [year, month, day, hour, minute];
+}
+
 async function FormatDateForIcs(date) {
   const jsDate = new Date(date);
 
@@ -133,7 +228,9 @@ async function ProcessTimeAndDate(date, time) {
 }
 
 //#endregion
+//#endregion
 
 module.exports = {
   ReadExcelFile,
+  testOfTime,
 };
